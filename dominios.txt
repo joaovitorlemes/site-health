@@ -1,0 +1,11 @@
+# Domínios para acompanhar o vencimento (registro + SSL). Um por linha.
+# Linhas com # são ignoradas. Adicione ou remova à vontade.
+lojapromobug.com.br
+destinosdeviagens.com.br
+lemestock.com.br
+concursosabertoshoje.com.br
+ragnarokservers.com.br
+wikiragnarok.com.br
+rankingtennis.com.br
+joaovitorlemes.com.br
+rifaspremium.com.br
