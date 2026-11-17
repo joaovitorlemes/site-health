@@ -1,0 +1,27 @@
+name: Descobrir chat ID do Telegram
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  chat-id:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Listar chats recentes do bot
+        env:
+          TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          curl -s "https://api.telegram.org/bot${TOKEN}/getUpdates" > updates.json
+          python3 - <<'PY'
+          import json
+          d = json.load(open("updates.json"))
+          print("ok:", d.get("ok"), "| updates:", len(d.get("result", [])), "|", d.get("description", ""))
+          seen = {}
+          for u in d.get("result", []):
+              for k in ("message", "channel_post", "my_chat_member", "edited_message"):
+                  c = (u.get(k) or {}).get("chat")
+                  if c:
+                      seen[c["id"]] = (c.get("type"), c.get("title") or c.get("username") or c.get("first_name"))
+          for i, (t, n) in seen.items():
+              print("CHAT", i, t, n)
+          PY

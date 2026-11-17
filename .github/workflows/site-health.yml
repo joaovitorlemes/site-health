@@ -1,0 +1,39 @@
+name: Saude dos sites
+
+on:
+  schedule:
+    - cron: "0 15 * * 0"   # domingo 12:00 (Brasilia, UTC-3)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write   # para salvar o historico semanal (mantem o agendamento ativo)
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Verificar sites e enviar ao Telegram
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python site_health.py -o relatorios || echo "Algum site esta vermelho (ver relatorio)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: relatorio
+          path: relatorios/
+          retention-days: 60
+      - name: Salvar resumo no historico
+        run: |
+          mkdir -p historico
+          cp relatorios/telegram_*.txt historico/
+          git config user.name "site-health-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add historico
+          git commit -m "Resumo semanal $(date +%Y-%m-%d)" || echo "Nada novo"
+          git push
