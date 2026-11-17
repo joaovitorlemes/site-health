@@ -15,3 +15,13 @@ Roda todo domingo às 12h (Brasília) via GitHub Actions e envia o resumo + rela
 e os itens manuais de `vencimentos.csv` (hospedagem, assinaturas, tokens). Só manda mensagem quando faltam
 30 ou 15 dias, e todo dia quando faltam 7 dias ou menos.
 Rodar na mão (**Actions → Vencimentos → Run workflow**) manda a lista completa.
+
+## Monitor do Make (de hora em hora)
+
+`make_monitor.py` consulta a API do Make (zona us2, time 7654) e avisa no Telegram quando:
+a conta fica pausada (operações do plano acabaram), um cenário ligado é desligado, fica inválido,
+ganha execuções incompletas ou tem execuções com erro. Também avisa quando volta ao normal.
+
+- Secret extra: `MAKE_API_TOKEN` (Make → perfil → **API access** → Add token, escopos `scenarios:read` e `organizations:read`)
+- O estado da última checagem fica no cache do Actions (`make_state.json`), sem gerar commits
+- Rodar na mão (**Actions → Monitor Make → Run workflow**) manda o estado completo

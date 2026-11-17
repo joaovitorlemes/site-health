@@ -1,0 +1,40 @@
+name: Monitor Make
+
+on:
+  schedule:
+    - cron: "41 * * * *"   # de hora em hora
+  workflow_dispatch: {}     # rodar na mao manda o estado completo
+
+concurrency:
+  group: make-monitor
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Restaurar estado da ultima checagem
+        uses: actions/cache/restore@v4
+        with:
+          path: make_state.json
+          key: make-state-${{ github.run_id }}
+          restore-keys: make-state-
+      - name: Verificar cenarios do Make
+        env:
+          MAKE_API_TOKEN: ${{ secrets.MAKE_API_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          FORCE_REPORT: ${{ github.event_name == 'workflow_dispatch' && '1' || '' }}
+        run: python make_monitor.py
+      - name: Salvar estado
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: make_state.json
+          key: make-state-${{ github.run_id }}
