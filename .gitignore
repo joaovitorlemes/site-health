@@ -3,3 +3,4 @@ __pycache__/
 *.html
 /telegram_*.txt
 make_state.json
+railway_state.json

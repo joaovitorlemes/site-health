@@ -26,3 +26,15 @@ ganha execuções incompletas ou tem execuções com erro. Também avisa quando 
 - Outras contas: secret `MAKE_TOKENS`, uma por linha no formato `Apelido|token` (ex.: `Cliente X|abc123...`)
 - O estado da última checagem fica no cache do Actions (`make_state.json`), sem gerar commits
 - Rodar na mão (**Actions → Monitor Make → Run workflow**) manda o estado completo
+
+## Monitor do Railway / n8n (de hora em hora)
+
+`railway_monitor.py` vigia o n8n hospedado no Railway (projeto awake-cat) e avisa no Telegram quando:
+o n8n não responde, algum serviço (n8n ou Postgres) não está rodando, algum disco passa de 70% de uso
+ou a memória do n8n passa de 4 GB. Também avisa quando volta ao normal.
+
+- Secret extra: `RAILWAY_TOKEN` (Railway → **Account Settings → Tokens** → Create token, sem workspace)
+  ou `RAILWAY_PROJECT_TOKEN` (projeto → **Settings → Tokens**, ambiente production)
+- Limites ajustáveis pelas variáveis `DISK_ALERT_PCT` e `MEM_ALERT_GB`
+- O estado da última checagem fica no cache do Actions (`railway_state.json`)
+- Rodar na mão (**Actions → Monitor Railway n8n → Run workflow**) manda o estado completo

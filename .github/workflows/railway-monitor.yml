@@ -1,0 +1,41 @@
+name: Monitor Railway n8n
+
+on:
+  schedule:
+    - cron: "51 * * * *"   # de hora em hora
+  workflow_dispatch: {}     # rodar na mao manda o estado completo
+
+concurrency:
+  group: railway-monitor
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Restaurar estado da ultima checagem
+        uses: actions/cache/restore@v4
+        with:
+          path: railway_state.json
+          key: railway-state-${{ github.run_id }}
+          restore-keys: railway-state-
+      - name: Verificar n8n no Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_TOKEN: ${{ secrets.RAILWAY_PROJECT_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          FORCE_REPORT: ${{ github.event_name == 'workflow_dispatch' && '1' || '' }}
+        run: python railway_monitor.py
+      - name: Salvar estado
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: railway_state.json
+          key: railway-state-${{ github.run_id }}
