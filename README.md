@@ -18,10 +18,11 @@ Rodar na mão (**Actions → Vencimentos → Run workflow**) manda a lista compl
 
 ## Monitor do Make (de hora em hora)
 
-`make_monitor.py` consulta a API do Make (zona us2, time 7654) e avisa no Telegram quando:
+`make_monitor.py` consulta a API do Make (uma ou várias contas, zonas descobertas sozinhas) e avisa no Telegram quando:
 a conta fica pausada (operações do plano acabaram), um cenário ligado é desligado, fica inválido,
 ganha execuções incompletas ou tem execuções com erro. Também avisa quando volta ao normal.
 
 - Secret extra: `MAKE_API_TOKEN` (Make → perfil → **API access** → Add token, escopos `scenarios:read` e `organizations:read`)
+- Outras contas: secret `MAKE_TOKENS`, uma por linha no formato `Apelido|token` (ex.: `Cliente X|abc123...`)
 - O estado da última checagem fica no cache do Actions (`make_state.json`), sem gerar commits
 - Rodar na mão (**Actions → Monitor Make → Run workflow**) manda o estado completo

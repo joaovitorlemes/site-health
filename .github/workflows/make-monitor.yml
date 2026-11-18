@@ -28,6 +28,7 @@ jobs:
       - name: Verificar cenarios do Make
         env:
           MAKE_API_TOKEN: ${{ secrets.MAKE_API_TOKEN }}
+          MAKE_TOKENS: ${{ secrets.MAKE_TOKENS }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           FORCE_REPORT: ${{ github.event_name == 'workflow_dispatch' && '1' || '' }}
